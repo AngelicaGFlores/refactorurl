@@ -1,8 +1,32 @@
 import Hero from "./components/Hero";
 import Navbar from "./components/Navbar";
+import { use, useState } from "react";
 
 function App() {
-  return (
+	const [text, setText] = useState("");
+	const [links, setLinks] = useState([]);
+	const handleClick = async () => {
+		try {
+			const response = await fetch("https://api-ssl.bitly.com/v4/shorten", {
+				method: "POST",
+				headers: {
+					Authorization: `Bearer 7a0a8b22221d9a4b13cc8b8d0fbc741db2b6387f`,
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					long_url: text,
+					domain: "bit.ly",
+				}),
+			});
+
+			const data = await response.json();
+			console.log(data);
+			setLinks((p) => [...p, { link: data.link, long: data.long_url }]);
+		} catch (error) {
+			console.error(error.message);
+		}
+	};
+	return (
 		<div>
 			<Navbar />
 			<div className="hero-image">
@@ -27,16 +51,26 @@ function App() {
 				<div id="inputURL">
 					<label htmlFor="text"></label>
 					<input
+						value={text}
+						onChange={(e) => setText(e.target.value)}
 						type="text"
 						id="usertextURL"
 						placeholder="Shorten a link here..."
 					/>
-					<button id="submit">submit</button>
+					<button id="submit" onClick={handleClick}>
+						submit
+					</button>
 				</div>
 			</div>
 
 			<section id="section">
-				<ul id="section-list">List of links created</ul>
+				<ul id="section-list">{
+				links.map(l => <li>
+					{
+						l.link
+					}
+				</li>)
+				}</ul>
 			</section>
 			<div className="container bg-light">
 				<article className="text-center">
@@ -53,7 +87,9 @@ function App() {
 						<div className="row align-items-center justify-content-center grid gap-3">
 							{/* <!-- This is the first card --> */}
 							<div className="col-sm-3 d-flex align-items-center">
-								<div className="card" style=   {{width: "18rem", height: "10rem"}} >
+								<div
+									className="card"
+									style={{ width: "18rem", height: "10rem" }}>
 									<img
 										src="/icon-brand-recognition.svg"
 										className="card-img-top position-absolute-top align-items-center start-50 w-25 h-25"
@@ -117,7 +153,7 @@ function App() {
 				<button id="hero-button">Get Started</button>
 			</div>
 
-			{/* <footer>
+			<footer>
 			<div className="container text-center">
 				<div className="row align-items-center">
 					<div className="col"><img src="/logo.svg" alt="" /></div>
@@ -155,10 +191,10 @@ function App() {
 						</table>
 					</div>
 					<div className="col d-flex justify-content-around">
-						<img src="/icon-facebook.svg" alt="facebook icon">
-						<img src="/icon-twitter.svg" alt="twitter icon">
-						<img src="/icon-pinterest.svg" alt=" pinterest icon">
-						<img src="/icon-instagram.svg" alt=" instagram icon">
+						<img src="/icon-facebook.svg" alt="facebook icon"/>
+						<img src="/icon-twitter.svg" alt="twitter icon"/>
+						<img src="/icon-pinterest.svg" alt=" pinterest icon"/>
+						<img src="/icon-instagram.svg" alt=" instagram icon"/>
 					</div>
 				</div>
 			</div>
@@ -174,7 +210,7 @@ function App() {
 				target="_blank"
 				>Angelica G Flores</a
 			>.
-		</div> */}
+		</div>
 		</div>
 	);
 }
